@@ -1,122 +1,21 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { ShieldCheck, Search, AlertTriangle, CheckCircle2, Sparkles, LockKeyhole, ChevronRight } from 'lucide-react'
 import './App.css'
 
+const demos = [
+  ['Fake internship', 'Congratulations! You have been selected for a Google internship. Pay ₹3,999 for verification within 30 minutes to secure your position.'],
+  ['Bank warning', 'SBI ALERT: Your account will be blocked today. Share OTP immediately to reactivate your account.'],
+  ['Scholarship', 'You have won a scholarship grant. Pay a processing fee of Rs. 1500 now to release funds.'],
+  ['Delivery', 'Your parcel is held. Pay the urgent delivery fee within 2 hours to avoid return.'],
+  ['Legitimate internship', 'Thank you for applying. Your interview is scheduled for Tuesday. Please reply to confirm availability.'],
+  ['Legitimate notification', 'Your monthly statement is ready in the official mobile app.']
+]
+const fallback = { risk_score:94,risk_level:'CRITICAL',classification:'potential_scam',summary:'The message contains multiple patterns associated with social-engineering attempts. Verify all claims independently before acting.',signals:[{key:'payment_request',severity:'high',title:'Upfront payment request',description:'The message asks for money before the claimed benefit.',evidence:'Pay ₹3,999 for verification'},{key:'artificial_urgency',severity:'high',title:'Artificial urgency',description:'The message pressures quick action.',evidence:'within 30 minutes'},{key:'impersonation',severity:'high',title:'Possible organization impersonation',description:'A known organization is invoked but the sender cannot be established.',evidence:'Google internship'}],entities:[{text:'Google',type:'organization'},{text:'₹3,999',type:'money'}],claims:[],recommendations:['Do not send money or share OTPs, passwords, or financial details.','Verify the sender through the organization’s official website or published contact details.','Keep screenshots and report suspected fraud through the relevant platform or cybercrime channel.'],confidence:.91,limitations:['TrustLens assesses patterns in supplied content; it cannot guarantee fraud or legitimacy.','Claims are unverified unless independently corroborated.'],context:'job_or_internship',detected_language:'en'}
+
 function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+ const [text,setText]=useState(demos[0][1]),[language,setLanguage]=useState('auto'),[result,setResult]=useState(null),[loading,setLoading]=useState(false),[error,setError]=useState('')
+ const analyze=async()=>{if(!text.trim())return setError('Paste a message to investigate first.');setLoading(true);setError('');try{const r=await fetch('http://localhost:8000/api/analyze',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,language})});if(!r.ok)throw Error('The investigation service is unavailable.');setResult(await r.json())}catch{setResult(fallback);setError('Showing a local demo result because the API is not running. Start the FastAPI server for live analysis.')}finally{setLoading(false)}}
+ const score=result?.risk_score||0, danger=score>=50
+ return <main><nav><div className="brand"><span><ShieldCheck size={22}/></span>TrustLens</div><div className="navnote"><LockKeyhole size={14}/> Privacy-first investigation</div></nav><section className="hero"><div className="eyebrow"><Sparkles size={14}/> EXPLAINABLE AI INVESTIGATIONS</div><h1>Know before you <i>trust.</i></h1><p>Turn suspicious messages into clear, evidence-led guidance. TrustLens never labels a claim as fact without verification.</p></section><section className="workspace"><div className="input-card"><div className="card-head"><div><span className="kicker">NEW INVESTIGATION</span><h2>What would you like to check?</h2></div><select value={language} onChange={e=>setLanguage(e.target.value)}><option value="auto">Detect language</option><option value="en">English</option><option value="hi">Hindi</option><option value="mr">Marathi</option></select></div><textarea value={text} onChange={e=>setText(e.target.value)} placeholder="Paste a suspicious message, email, job offer, or SMS…"/><div className="actions"><button className="primary" onClick={analyze} disabled={loading}><Search size={17}/>{loading?'Investigating…':'Analyze message'}</button><button className="quiet" onClick={()=>{setText('');setResult(null);setError('')}}>Clear</button><span>{text.length} characters</span></div>{error&&<div className="notice"><AlertTriangle size={16}/>{error}</div>}</div><aside className="demo-card"><span className="kicker">DEMO MODE</span><h3>Try a scenario</h3><p>Built-in examples make the investigation flow easy to demonstrate.</p><div>{demos.map(([name,value])=><button key={name} onClick={()=>{setText(value);setResult(null)}}>{name}<ChevronRight size={15}/></button>)}</div></aside></section>{result&&<section className="report"><div className="report-title"><div><span className="kicker">INVESTIGATION REPORT</span><h2>{danger?'High-risk message detected':'Investigation complete'}</h2><p>{result.summary}</p></div><div className={'score '+(danger?'danger':'safe')}><b>{score}</b><span>/100</span><strong>{result.risk_level} RISK</strong></div></div><div className="grid"><article className="panel signals"><h3>Why TrustLens flagged this</h3>{result.signals.length?result.signals.map(s=><div className="signal" key={s.key}><AlertTriangle size={19}/><div><b>{s.title}</b><p>{s.description}</p>{s.evidence&&<em>Evidence: “{s.evidence}”</em>}</div></div>):<p className="empty">No common high-risk patterns were detected.</p>}</article><article className="panel"><h3>Recommended action</h3><ol>{result.recommendations.map(x=><li key={x}>{x}</li>)}</ol><div className="meta"><span>Context</span><b>{result.context?.replaceAll('_',' ')}</b><span>Confidence</span><b>{Math.round(result.confidence*100)}%</b></div></article></div><div className="grid lower"><article className="panel"><h3>Extracted entities</h3><div className="chips">{result.entities.length?result.entities.map((e,i)=><span key={i}>{e.text}<small>{e.type}</small></span>):'No named entities extracted.'}</div></article><article className="panel limitations"><h3>Important limitations</h3>{result.limitations.map(x=><p key={x}><CheckCircle2 size={15}/>{x}</p>)}</article></div></section>}<footer>TrustLens is an assistive risk-analysis tool. It does not guarantee fraud or legitimacy.</footer></main>
 }
-
 export default App
