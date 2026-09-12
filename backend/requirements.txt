@@ -19,3 +19,4 @@ beautifulsoup4
 tldextract
 openai
 pytest
+tldextract
