@@ -116,7 +116,6 @@ When a URL is present, TrustLens examines security-related characteristics such 
 TrustLens does **not execute downloaded code or unsafe content**.
 
 ### ⚠️ Explainable Risk Score
-
 The Risk Engine combines different signals and produces:
 
 ```text
